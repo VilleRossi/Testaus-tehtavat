@@ -18,6 +18,7 @@ const Ravintola = function () {
   this.jalkiruokaHinta = 4;
   this.juomaHinta = 3;
   this.paikkojenMaara = 15;
+  this.paikat; // TÃ¤hÃ¤n muuttujaan paikkojen taulukko
 };
 
 /**
@@ -47,10 +48,10 @@ Ravintola.prototype.syoRavintolassa = function (asiakkaidenMaara) {
   for (let i = 0; i < asiakkaidenMaara; i++) {
     console.log('-------------------------------------------------------');
     console.log(
-      'Tarjoillaan asiakasta numero ' + (i + 1) + '. MitÃ¤ teille saisi olla?'
+      'Tarjoillaan asiakasta numero ' + (i + 1) + '. MitÃ¤ teille saisi olla?',
     );
     tilaukset.push(
-      this.tilaaAteria(generoiBoolean(), generoiBoolean(), generoiBoolean())
+      this.tilaaAteria(generoiBoolean(), generoiBoolean(), generoiBoolean()),
     );
     console.log('Asiakkaalle tarjoiltu. HyvÃ¤Ã¤ ruokahalua!');
   }
@@ -75,22 +76,60 @@ Ravintola.prototype.tarkistaPaikkojenMaara = function (asiakkaidenMaara) {
   }
   if (asiakkaidenMaara <= 0) {
     console.log(
-      'IkÃ¤vÃ¤ kyllÃ¤ emme voi tarjoilla ' + asiakkaidenMaara + ' asiakkaalle.'
+      'IkÃ¤vÃ¤ kyllÃ¤ emme voi tarjoilla ' + asiakkaidenMaara + ' asiakkaalle.',
     );
     return false;
   } else if (asiakkaidenMaara <= this.paikkojenMaara) {
     console.log(
-      'Tilaa on ' + asiakkaidenMaara + ' asiakkaalle. Tervetuloa ravintolaamme!'
+      'Tilaa on ' +
+        asiakkaidenMaara +
+        ' asiakkaalle. Tervetuloa ravintolaamme!',
     );
     return true;
   } else {
     console.log(
-      'IkÃ¤vÃ¤ kyllÃ¤ ravintolaamme ei mahdu ' + asiakkaidenMaara + ' asiakasta.'
+      'IkÃ¤vÃ¤ kyllÃ¤ ravintolaamme ei mahdu ' +
+        asiakkaidenMaara +
+        ' asiakasta.',
     );
     return false;
   }
 };
 
+/**
+ * Luo Ravintolan paikat-muuttujaan uuden taulukon, jonka koko mÃ¤Ã¤rÃ¤ytyy paikkojenMaara-muuttujan mukaisesti,
+ * ja tÃ¤yttÃ¤Ã¤ taulukon boolean arvolla false.
+ */
+Ravintola.prototype.generoiPaikat = function () {
+  this.paikat = [];
+
+  for (let i = 0; i < this.paikkojenMaara; i++) {
+    this.paikat.push(false);
+  }
+  return this.paikat;
+};
+
+/**
+ * JSDoc tÃ¤nne
+ */
+Ravintola.prototype.varaaPaikat = function (varauksenMaara) {
+  if (!Array.isArray(this.paikat)) {
+    this.generoiPaikat();
+  }
+
+  if (varuksenMaara === undefined) {
+    varauksenMaara = 1;
+  }
+
+  let vapaatPaikat = 0;
+
+  this.paikat.forEach((paikka) => {
+    if (paikka === false) {
+      vapaatPaikat++;
+    }
+  });
+  return vapaatPaikat;
+};
 /**
  * Ottaa parametreina 3 boolean arvoa, joiden avulla mÃ¤Ã¤ritellÃ¤Ã¤n mitÃ¤ ruokia asiakas tilaa.
  * Jos parametrit eivÃ¤t ole tyyppiÃ¤ boolean, heitetÃ¤Ã¤n TypeError.
@@ -109,7 +148,7 @@ Ravintola.prototype.tarkistaPaikkojenMaara = function (asiakkaidenMaara) {
 Ravintola.prototype.tilaaAteria = function (
   ottaaAlkuruoan,
   ottaaJalkiruoan,
-  ottaaJuoman
+  ottaaJuoman,
 ) {
   if (
     typeof ottaaAlkuruoan !== 'boolean' ||
@@ -174,7 +213,7 @@ Ravintola.prototype.palautaTaulukonSatunnainenArvo = function (taulukko) {
 Ravintola.prototype.laskeLasku = function (
   ottiAlkuruoan,
   ottiJalkiruoan,
-  ottiJuoman
+  ottiJuoman,
 ) {
   if (
     typeof ottiAlkuruoan !== 'boolean' ||
