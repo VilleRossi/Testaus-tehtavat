@@ -4,14 +4,24 @@ OHJELMAKOODI
 */
 
 const Ravintola = function () {
-  this.alkuruoat = ['Tomaattikeitto', 'LeipÃ¤', 'Vihersalaatti', 'Salsa'];
-  this.paaruoat = [
-    'Kalakeitto',
-    'Makaroonilaatikko',
-    'Kasvispihvi',
-    'Kanasalaatti',
+  this.alkuruoat = [
+    { ruoka: 'Tomaattikeitto', hinta: 4 },
+    { ruoka: 'LeipÃ¤', hinta: 3 },
+    { ruoka: 'Vihersalaatti', hinta: 5 },
+    { ruoka: 'Salsa', hinta: 6 },
   ];
-  this.jalkiruoat = ['HedelmÃ¤salaatti', 'JÃ¤Ã¤telÃ¶', 'Pulla', 'Donitsi'];
+  this.paaruoat = [
+    { ruoka: 'Kalakeitto', hinta: 7 },
+    { ruoka: 'Makaroonilaatikko', hinta: 8 },
+    { ruoka: 'Kasvispihvi', hinta: 6 },
+    { ruoka: 'Kanasalaatti', hinta: 9 },
+  ];
+  this.jalkiruoat = [
+    { ruoka: 'HedelmÃ¤salaatti', hinta: 4 },
+    { ruoka: 'JÃ¤Ã¤telÃ¶', hinta: 3 },
+    { ruoka: 'Pulla', hinta: 2 },
+    { ruoka: 'Donitsi', hinta: 3 },
+  ];
   this.juomat = ['Tee', 'Kahvi', 'Maito', 'Mehu'];
   this.alkuruokaHinta = 4;
   this.paaruokaHinta = 6;
@@ -42,6 +52,12 @@ Ravintola.prototype.syoRavintolassa = function (asiakkaidenMaara) {
   const onTilaa = this.tarkistaPaikkojenMaara(asiakkaidenMaara);
   if (!onTilaa) {
     return;
+  }
+
+  if (this.varaaPaikat(asiakkaidenMaara)) {
+    console.log('Paikat varattu');
+  } else {
+    console.log('Paikat ovat täynnä');
   }
   const tilaukset = [];
 
@@ -110,14 +126,18 @@ Ravintola.prototype.generoiPaikat = function () {
 };
 
 /**
- * JSDoc tÃ¤nne
+ * Jos paikkoja ei ole , kutsutaan generoipaikat-funktiota ja luodaan ne.
+ * tarkistetaan varasusten maara ja tarkistetaan onko vapaita paikkoja sekä varataan paikat
+ * Lopuksi lisätään varattujen paikkojen määrä ja palatetaan onnistuminen
+ * @param {number} varauksenMaara
+ * @return {boolean} Onnistuminen
  */
 Ravintola.prototype.varaaPaikat = function (varauksenMaara) {
   if (!Array.isArray(this.paikat)) {
     this.generoiPaikat();
   }
 
-  if (varuksenMaara === undefined) {
+  if (varauksenMaara === undefined) {
     varauksenMaara = 1;
   }
 
@@ -128,7 +148,19 @@ Ravintola.prototype.varaaPaikat = function (varauksenMaara) {
       vapaatPaikat++;
     }
   });
-  return vapaatPaikat;
+  if (vapaatPaikat < varauksenMaara) {
+    return false;
+  }
+  let varatutPaikat = 0;
+  if (vapaatPaikat >= varauksenMaara) {
+    this.paikat.forEach((paikka, index) => {
+      if (paikka === false && varatutPaikat < varauksenMaara) {
+        this.paikat[index] = true;
+        varatutPaikat++;
+      }
+    });
+    return true;
+  }
 };
 /**
  * Ottaa parametreina 3 boolean arvoa, joiden avulla mÃ¤Ã¤ritellÃ¤Ã¤n mitÃ¤ ruokia asiakas tilaa.
