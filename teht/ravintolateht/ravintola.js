@@ -54,10 +54,8 @@ Ravintola.prototype.syoRavintolassa = function (asiakkaidenMaara) {
     return;
   }
 
-  if (this.varaaPaikat(asiakkaidenMaara)) {
-    console.log('Paikat varattu');
-  } else {
-    console.log('Paikat ovat täynnä');
+  if (!this.varaaPaikat(asiakkaidenMaara)) {
+    throw new Error('Ei tarpeeksi vapaita paikkoja');
   }
   const tilaukset = [];
 
@@ -149,7 +147,7 @@ Ravintola.prototype.varaaPaikat = function (varauksenMaara) {
     }
   });
   if (vapaatPaikat < varauksenMaara) {
-    return false;
+    throw new Error('Ei tarpeeksi vapaita paikkoja');
   }
   let varatutPaikat = 0;
   if (vapaatPaikat >= varauksenMaara) {
@@ -215,7 +213,7 @@ Ravintola.prototype.tilaaAteria = function (
     ruoat.push(ruoka);
   }
 
-  const summa = this.laskeLasku(ottaaAlkuruoan, ottaaJalkiruoan, ottaaJuoman);
+  const summa = this.laskeLasku(ruoat);
 
   return { summa, ruoat };
 };
@@ -242,34 +240,12 @@ Ravintola.prototype.palautaTaulukonSatunnainenArvo = function (taulukko) {
  * @param {boolean} ottiJuoman
  * @return {number}
  */
-Ravintola.prototype.laskeLasku = function (
-  ottiAlkuruoan,
-  ottiJalkiruoan,
-  ottiJuoman,
-) {
-  if (
-    typeof ottiAlkuruoan !== 'boolean' ||
-    typeof ottiJalkiruoan !== 'boolean' ||
-    typeof ottiJuoman !== 'boolean'
-  ) {
-    throw new TypeError();
-  }
-
+Ravintola.prototype.laskeLasku = function (ruoat) {
   let loppuSumma = 0;
 
-  loppuSumma += this.paaruokaHinta;
-
-  if (ottiAlkuruoan) {
-    loppuSumma += this.alkuruokaHinta;
-  }
-
-  if (ottiJalkiruoan) {
-    loppuSumma += this.jalkiruokaHinta;
-  }
-
-  if (ottiJuoman) {
-    loppuSumma += this.juomaHinta;
-  }
+  ruoat.forEach((ruoka) => {
+    loppuSumma += ruoka.hinta;
+  });
 
   return loppuSumma;
 };
